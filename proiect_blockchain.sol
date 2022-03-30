@@ -19,15 +19,18 @@ contract Lottery {
         sumatotala += msg.value;
     }
 
-    function getRandomNumber() public view returns (uint) {
-        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players)));
+    function getRandomNumber(uint seed) public view returns (uint) {
+        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, seed, players)));
     }
 
     function finalizareTombola() public validEnd{
-        uint index = getRandomNumber() % players.length;
-        uint index2 = getRandomNumber() % players.length;
+        uint seed = 0;
+        uint index = getRandomNumber(seed) % players.length;
+        seed = seed + 1;
+        uint index2 = getRandomNumber(seed) % players.length;
         while(index==index2){
-        index2 = getRandomNumber() % players.length;
+            seed = seed + 1;
+            index2 = getRandomNumber(seed) % players.length;
         }
         players[index].transfer(address(this).balance * 7 / 10);
         players[index2].transfer(sumatotala / 4);
